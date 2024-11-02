@@ -16,13 +16,45 @@ describe('Dog Facts', () => {
     cy.get('@emptyState');
   });
 
-  it('should make a request when the button is called', () => {});
+  it('should make a request when the button is clicked', () => {
+    cy.get('@fetchButton').click();
 
-  it('should adjust the amount when the select is changed', () => {});
+    cy.wait('@api');
+  });
 
-  it('should show the correct number of facts on the page', () => {});
+  it('should adjust the amount when the select is changed', () => {
+    cy.get('@amountSelect').select('5');
 
-  it('should clear the facts when the "Clear" button is pressed', () => {});
+    cy.get('@fetchButton').click();
 
-  it("should reflect the number of facts we're looking for in the title", () => {});
+    cy.wait('@api').then((interception) => {
+      expect(interception.request.url.includes('amount=5'));
+    });
+  });
+
+  it('should show the correct number of facts on the page', () => {
+    cy.get('@amountSelect').select('5');
+
+    cy.get('@fetchButton').click();
+
+    cy.wait('@api');
+
+    cy.get('[data-test="dog-fact"]').its('length').should('eq', 5);
+  });
+
+  it('should clear the facts when the "Clear" button is pressed', () => {
+    cy.get('@clearButton').click();
+
+    cy.get('@emptyState');
+  });
+
+  it("should reflect the number of facts we're looking for in the title", () => {
+    cy.get('@amountSelect').select('5');
+
+    cy.get('@fetchButton').click();
+
+    cy.wait('@api');
+
+    cy.title().should('eq', '5 Dog Facts');
+  });
 });
